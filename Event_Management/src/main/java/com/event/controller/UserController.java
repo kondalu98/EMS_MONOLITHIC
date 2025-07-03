@@ -1,6 +1,5 @@
 package com.event.controller;
 import com.event.dto.LoginRequest;
-import com.event.entity.Event;
 import com.event.entity.User;
 import com.event.security.JwtUtil;
 import com.event.service.UserService;

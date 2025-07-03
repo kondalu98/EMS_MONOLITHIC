@@ -1,24 +1,14 @@
 package com.event.service;
-
 import static org.junit.jupiter.api.Assertions.*;
-
 import org.junit.jupiter.api.Test;
-
-
 import com.event.entity.User;
 import com.event.exception.InvalidCredentialsException;
 import com.event.exception.UserAlreadyExistsException;
 import com.event.repo.UserRepository;
-
 import org.junit.jupiter.api.BeforeEach;
-
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
 import static org.mockito.Mockito.*;
-
-
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -40,7 +30,6 @@ class UserServiceImplTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-
         user = new User();
         user.setId(1L);
         user.setEmail("test@example.com");
@@ -49,15 +38,10 @@ class UserServiceImplTest {
 
     @Test
     void testRegister_Success() {
-        // Given email does not exist
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.empty());
         when(passwordEncoder.encode("plainPassword")).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
-
-        // When
         User savedUser = userService.register(user);
-
-        // Then
         assertNotNull(savedUser);
         assertEquals("encodedPassword", savedUser.getPassword());
         verify(userRepository).save(savedUser);
@@ -67,8 +51,6 @@ class UserServiceImplTest {
     void testRegister_UserAlreadyExists() {
         // Given email already exists
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(user));
-
-        // Then
         assertThrows(UserAlreadyExistsException.class, () -> userService.register(user));
     }
 
@@ -78,14 +60,11 @@ class UserServiceImplTest {
         dbUser.setEmail("test@example.com");
         dbUser.setPassword("encodedPassword");
 
-        // Given: user exists, password matches
         when(userRepository.findByEmail("test@example.com")).thenReturn(Optional.of(dbUser));
         when(passwordEncoder.matches("plainPassword", "encodedPassword")).thenReturn(true);
 
-        // When
         User loggedInUser = userService.login("test@example.com", "plainPassword");
 
-        // Then
         assertNotNull(loggedInUser);
         assertEquals("test@example.com", loggedInUser.getEmail());
     }
@@ -110,5 +89,31 @@ class UserServiceImplTest {
         assertThrows(InvalidCredentialsException.class, () ->
                 userService.login("notfound@example.com", "password"));
     }
+    @Test
+    void testUpdate_Success() {
+        User existingUser = new User();
+        existingUser.setId(1L);
+        existingUser.setName("Old Name");
+        existingUser.setPassword("oldPassword");
+        existingUser.setContactNumber("1234567890");
+
+        User updatedDetails = new User();
+        updatedDetails.setName("New Name");
+        updatedDetails.setPassword("newPassword");
+        updatedDetails.setContactNumber("9876543210");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(existingUser));
+        when(passwordEncoder.encode("newPassword")).thenReturn("encodedNewPassword");
+        when(userRepository.save(any(User.class))).thenAnswer(i -> i.getArgument(0));
+
+        User result = userService.update(1L, updatedDetails);
+
+        assertEquals("New Name", result.getName());
+        assertEquals("encodedNewPassword", result.getPassword());
+        assertEquals("9876543210", result.getContactNumber());
+
+        verify(userRepository).save(result);
+    }
+
 }
 

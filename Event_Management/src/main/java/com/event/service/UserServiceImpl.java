@@ -1,8 +1,5 @@
 package com.event.service;
-
-import com.event.entity.Event;
 import com.event.entity.User;
-import com.event.exception.EventNotFoundException;
 import com.event.exception.InvalidCredentialsException;
 import com.event.exception.UserAlreadyExistsException;
 import com.event.exception.UserNotFoundException;
