@@ -36,6 +36,7 @@ public class SecurityConfig {
                         "/api/admin/login"
                 ).permitAll()
 
+                    .requestMatchers(HttpMethod.PUT, "api/users/update/{id}").authenticated()
                 //  feedback POST
                 .requestMatchers(HttpMethod.POST, "/api/feedback/**").authenticated()
 

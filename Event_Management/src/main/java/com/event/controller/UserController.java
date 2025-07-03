@@ -1,5 +1,6 @@
 package com.event.controller;
 import com.event.dto.LoginRequest;
+import com.event.entity.Event;
 import com.event.entity.User;
 import com.event.security.JwtUtil;
 import com.event.service.UserService;
@@ -29,6 +30,15 @@ public class UserController {
         Map<String, String> response = Map.of("token", token, "email", user.getEmail());
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<User> updateUser(@PathVariable Long id,@RequestBody User userDetails) {
+        User updatedUser = userService.update(id, userDetails);
+        return ResponseEntity.ok(updatedUser);
+
+    }
+
+
 }
 
 

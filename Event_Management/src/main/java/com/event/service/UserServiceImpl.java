@@ -1,8 +1,11 @@
 package com.event.service;
 
+import com.event.entity.Event;
 import com.event.entity.User;
+import com.event.exception.EventNotFoundException;
 import com.event.exception.InvalidCredentialsException;
 import com.event.exception.UserAlreadyExistsException;
+import com.event.exception.UserNotFoundException;
 import com.event.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,4 +41,22 @@ public class UserServiceImpl implements UserService {
                 .filter(user -> passwordEncoder.matches(password, user.getPassword()))
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
     }
+
+    @Override
+    public User update(Long userId, User userDetails) {
+
+        User existingUser = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException(userId));
+
+        existingUser.setName(userDetails.getName());
+        existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+        existingUser.setContactNumber(userDetails.getContactNumber());
+
+        return userRepository.save(existingUser);
+
+
+
+    }
+
+
 }
