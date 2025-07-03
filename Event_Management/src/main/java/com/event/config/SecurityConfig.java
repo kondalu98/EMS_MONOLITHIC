@@ -17,54 +17,82 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig {
 
-	@Autowired
-	private JwtFilter jwtFilter;
+    @Autowired
+    private JwtFilter jwtFilter;
 
-	@Value("${admin.email}")
-	private String adminEmail;
+    @Value("${admin.email}")
+    private String adminEmail;
 
-	@Bean
-	SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		return http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(auth -> auth
-				
-				.requestMatchers("/api/users/**", "/api/admin/login").permitAll().
-				
-				 requestMatchers("/api/tickets/**").permitAll()
-				 
-				.requestMatchers(HttpMethod.POST, "/api/feedback/**").permitAll()
-				
-				.requestMatchers(HttpMethod.GET, "/api/events", "/api/events/{id}", "/api/events/date",
-						"/api/events/location", "/api/events/category"
-						).permitAll()
-				
-				//only admin can post events
-				.requestMatchers("/api/events/**", "/api/events/event/**").access((authContext, context) -> {
-					    String email = authContext.get().getName(); // <-- Breakpoint here
-					    System.out.println("Authenticated Email: " + email); // Add this for quick checks
-					    System.out.println("Admin Email from Config: " + adminEmail); // Add this
-					    return new AuthorizationDecision(email.equals(adminEmail));
-					})
-				
-				.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/v3/api-docs",
-						"/v3/api-docs.yaml").permitAll()
-				
+    @Bean
+    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-				// Only admin can POST notifications
-				.requestMatchers(HttpMethod.POST, "/api/notifications/**").access((authContext, context) -> {
-					String email = authContext.get().getName();
-					return new AuthorizationDecision(email.equals(adminEmail));
-				})
+        http.csrf(csrf -> csrf.disable())
 
-						.requestMatchers(HttpMethod.POST, "/api/feedback").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/feedback/user/**").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/feedback/event/**", "/api/feedback/event-rating/**")
-						.access((authContext, context) -> {
-							String email = authContext.get().getName();
-							return new AuthorizationDecision(email.equals(adminEmail));
-						})
-				.requestMatchers(HttpMethod.GET, "/api/notifications/alerts/**").authenticated()
-				.anyRequest().authenticated())
-				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).build();
-	}
+            .authorizeHttpRequests(auth -> auth
+
+                // Public endpoints
+                .requestMatchers(
+                        "/api/users/**",
+                        "/api/admin/login",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/v3/api-docs",
+                        "/v3/api-docs.yaml"
+                ).permitAll()
+
+                //  feedback POST
+                .requestMatchers(HttpMethod.POST, "/api/feedback/**").authenticated()
+
+                // Public event GET endpoints
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/api/events",
+                        "/api/events/{id}",
+                        "/api/events/date",
+                        "/api/events/location",
+                        "/api/events/category"
+                ).permitAll()
+
+                // Only admin can POST/PUT/DELETE events
+                .requestMatchers("/api/events/event","/api/events/event/{id}").access((authContext, context) -> {
+                    String email = authContext.get().getName();
+                    return new AuthorizationDecision(email.equals(adminEmail));
+                })
+
+                    //Authenticated users can book the tickets
+                .requestMatchers("/api/tickets/**").authenticated()
+
+                    //Authenticated users can give the feedback
+                .requestMatchers(HttpMethod.POST, "/api/feedback/**").authenticated()
+
+
+                // Only admin can POST notifications
+                .requestMatchers(HttpMethod.POST, "/api/notifications/**").access((authContext, context) -> {
+                    String email = authContext.get().getName();
+                    return new AuthorizationDecision(email.equals(adminEmail));
+                })
+
+                // Only admin can GET feedback for events
+                .requestMatchers(HttpMethod.GET, "/api/feedback/event/**", "/api/feedback/event-rating/**","api/feedback/user/{id}")
+                        .access((authContext, context) -> {
+                            String email = authContext.get().getName();
+                            return new AuthorizationDecision(email.equals(adminEmail));
+                        })
+
+                // Feedback GET by user is public
+                .requestMatchers(HttpMethod.GET, "/api/feedback/user/**").permitAll()
+
+                // Authenticated users can get notification alerts
+                .requestMatchers(HttpMethod.GET, "/api/notifications/alerts/**").authenticated()
+
+                // Any other request must be authenticated
+                .anyRequest().authenticated()
+            )
+
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 }
