@@ -1,6 +1,8 @@
 package com.event.service;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import com.event.entity.User;
 import com.event.exception.InvalidCredentialsException;
 import com.event.exception.UserAlreadyExistsException;
@@ -10,10 +12,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @Mock
@@ -29,7 +33,6 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
         user = new User();
         user.setId(1L);
         user.setEmail("test@example.com");
@@ -84,10 +87,10 @@ class UserServiceImplTest {
 
     @Test
     void testLogin_UserNotFound() {
-        when(userRepository.findByEmail("notfound@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("sample@example.com")).thenReturn(Optional.empty());
 
         assertThrows(InvalidCredentialsException.class, () ->
-                userService.login("notfound@example.com", "password"));
+                userService.login("sample@example.com", "password"));
     }
     @Test
     void testUpdate_Success() {

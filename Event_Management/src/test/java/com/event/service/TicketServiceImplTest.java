@@ -17,14 +17,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -73,10 +72,10 @@ class TicketServiceImplTest {
 
         Ticket booked = ticketService.bookTicket(1L, 1L);
 
-        assertThat(booked).isNotNull();
-        assertThat(booked.getEvent().getEventID()).isEqualTo(1L);
-        assertThat(booked.getUser().getId()).isEqualTo(1L);
-        assertThat(booked.getStatus()).isEqualTo(Ticket.TicketStatus.CONFIRMED);
+        assertNotNull(booked);
+        assertEquals(1L, booked.getEvent().getEventID());
+        assertEquals(1L, booked.getUser().getId());
+        assertEquals(Ticket.TicketStatus.CONFIRMED, booked.getStatus());
 
         verify(eventRepository).findById(1L);
         verify(userRepository).findById(1L);
@@ -87,8 +86,7 @@ class TicketServiceImplTest {
     void testBookTicket_EventNotFound() {
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> ticketService.bookTicket(1L, 1L))
-                .isInstanceOf(EventNotFoundException.class);
+        assertThrows(EventNotFoundException.class, () -> ticketService.bookTicket(1L, 1L));
     }
 
     @Test
@@ -96,8 +94,7 @@ class TicketServiceImplTest {
         when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> ticketService.bookTicket(1L, 1L))
-                .isInstanceOf(UserNotFoundException.class);
+        assertThrows(UserNotFoundException.class, () -> ticketService.bookTicket(1L, 1L));
     }
 
     @Test
@@ -106,8 +103,8 @@ class TicketServiceImplTest {
 
         Ticket found = ticketService.getTicketById(1L);
 
-        assertThat(found).isNotNull();
-        assertThat(found.getTicketId()).isEqualTo(1L);
+        assertNotNull(found);
+        assertEquals(1L, found.getTicketId());
 
         verify(ticketRepository).findById(1L);
     }
@@ -116,8 +113,7 @@ class TicketServiceImplTest {
     void testGetTicketById_NotFound() {
         when(ticketRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> ticketService.getTicketById(1L))
-                .isInstanceOf(TicketNotFoundException.class);
+        assertThrows(TicketNotFoundException.class, () -> ticketService.getTicketById(1L));
     }
 
     @Test
@@ -127,12 +123,14 @@ class TicketServiceImplTest {
 
         List<Ticket> tickets = ticketService.getTicketsByUserId(1L);
 
-        assertThat(tickets).hasSize(1);
-        assertThat(tickets.get(0).getUser().getId()).isEqualTo(1L);
+        assertNotNull(tickets);
+        assertEquals(1, tickets.size());
+        assertEquals(1L, tickets.get(0).getUser().getId());
 
         verify(userRepository).findById(1L);
         verify(ticketRepository).findByUser_Id(1L);
     }
+
     @Test
     void testCancelTicket() {
         when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
@@ -140,7 +138,7 @@ class TicketServiceImplTest {
 
         Ticket cancelled = ticketService.cancelTicket(1L);
 
-        assertThat(cancelled.getStatus()).isEqualTo(Ticket.TicketStatus.CANCELED);
+        assertEquals(Ticket.TicketStatus.CANCELED, cancelled.getStatus());
 
         verify(ticketRepository).findById(1L);
         verify(ticketRepository).save(any(Ticket.class));
@@ -150,8 +148,7 @@ class TicketServiceImplTest {
     void testCancelTicket_NotFound() {
         when(ticketRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> ticketService.cancelTicket(1L))
-                .isInstanceOf(TicketNotFoundException.class);
+        assertThrows(TicketNotFoundException.class, () -> ticketService.cancelTicket(1L));
     }
 
     @Test
@@ -159,8 +156,7 @@ class TicketServiceImplTest {
         ticket.setStatus(Ticket.TicketStatus.CANCELED);
         when(ticketRepository.findById(1L)).thenReturn(Optional.of(ticket));
 
-        assertThatThrownBy(() -> ticketService.cancelTicket(1L))
-                .isInstanceOf(TicketCancellationException.class);
+        assertThrows(TicketCancellationException.class, () -> ticketService.cancelTicket(1L));
 
         verify(ticketRepository).findById(1L);
     }
@@ -171,7 +167,9 @@ class TicketServiceImplTest {
 
         List<Ticket> tickets = ticketService.getAllTickets();
 
-        assertThat(tickets).hasSize(1);
+        assertNotNull(tickets);
+        assertEquals(1, tickets.size());
+
         verify(ticketRepository).findAll();
     }
 }

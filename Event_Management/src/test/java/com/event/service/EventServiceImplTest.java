@@ -10,7 +10,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -18,7 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -50,8 +49,9 @@ class EventServiceImplTest {
 
         Event created = eventService.createEvent(event);
 
-        assertThat(created).isNotNull();
-        assertThat(created.getName()).isEqualTo("Annual Fest");
+        assertNotNull(created);
+        assertEquals("Annual Fest", created.getName());
+
         verify(eventRepository).save(any(Event.class));
     }
 
@@ -61,8 +61,8 @@ class EventServiceImplTest {
 
         Event foundEvent = eventService.getEventById(1L);
 
-        assertThat(foundEvent).isNotNull();
-        assertThat(foundEvent.getName()).isEqualTo("Annual Fest");
+        assertNotNull(foundEvent);
+        assertEquals("Annual Fest", foundEvent.getName());
         verify(eventRepository).findById(1L);
     }
 
@@ -70,8 +70,7 @@ class EventServiceImplTest {
     void testGetEventById_NotFound() {
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> eventService.getEventById(1L))
-                .isInstanceOf(EventNotFoundException.class);
+        assertThrows(EventNotFoundException.class, () -> eventService.getEventById(1L));
     }
 
     @Test
@@ -80,7 +79,8 @@ class EventServiceImplTest {
 
         List<Event> events = eventService.findByCategory("Cultural");
 
-        assertThat(events).hasSize(1);
+        assertNotNull(events);
+        assertEquals(1, events.size());
         verify(eventRepository).findByCategory("Cultural");
     }
 
@@ -90,7 +90,8 @@ class EventServiceImplTest {
 
         List<Event> events = eventService.findByLocation("Hyderabad");
 
-        assertThat(events).hasSize(1);
+        assertNotNull(events);
+        assertEquals(1, events.size());
         verify(eventRepository).findByLocation("Hyderabad");
     }
 
@@ -101,7 +102,8 @@ class EventServiceImplTest {
 
         List<Event> events = eventService.findByDate(date);
 
-        assertThat(events).hasSize(1);
+        assertNotNull(events);
+        assertEquals(1, events.size());
         verify(eventRepository).findByDate(date);
     }
 
@@ -111,7 +113,8 @@ class EventServiceImplTest {
 
         List<Event> events = eventService.getAllEvents();
 
-        assertThat(events).hasSize(1);
+        assertNotNull(events);
+        assertEquals(1, events.size());
         verify(eventRepository).findAll();
     }
 
@@ -129,9 +132,10 @@ class EventServiceImplTest {
 
         Event result = eventService.updateEvent(1L, updatedEvent);
 
-        assertThat(result.getName()).isEqualTo("Updated Fest");
-        assertThat(result.getCategory()).isEqualTo("Music");
-        assertThat(result.getLocation()).isEqualTo("Bangalore");
+        assertEquals("Updated Fest", result.getName());
+        assertEquals("Music", result.getCategory());
+        assertEquals("Bangalore", result.getLocation());
+
         verify(eventRepository).findById(1L);
         verify(eventRepository).save(event);
     }
@@ -140,8 +144,7 @@ class EventServiceImplTest {
     void testUpdateEvent_NotFound() {
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> eventService.updateEvent(1L, event))
-                .isInstanceOf(EventNotFoundException.class);
+        assertThrows(EventNotFoundException.class, () -> eventService.updateEvent(1L, event));
     }
 
     @Test
@@ -160,7 +163,6 @@ class EventServiceImplTest {
     void testDeleteEvent_NotFound() {
         when(eventRepository.existsById(1L)).thenReturn(false);
 
-        assertThatThrownBy(() -> eventService.deleteEvent(1L))
-                .isInstanceOf(EventNotFoundException.class);
+        assertThrows(EventNotFoundException.class, () -> eventService.deleteEvent(1L));
     }
 }

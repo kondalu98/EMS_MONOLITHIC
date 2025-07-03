@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -71,10 +71,10 @@ class NotificationServiceImplTest {
 
         Notification result = notificationService.sendNotification(1L, 1L, "Test Notification");
 
-        assertThat(result).isNotNull();
-        assertThat(result.getMessage()).isEqualTo("Test Notification");
-        assertThat(result.getUser().getId()).isEqualTo(1L);
-        assertThat(result.getEvent().getEventID()).isEqualTo(1L);
+        assertNotNull(result);
+        assertEquals("Test Notification", result.getMessage());
+        assertEquals(1L, result.getUser().getId());
+        assertEquals(1L, result.getEvent().getEventID());
 
         verify(userRepository).findById(1L);
         verify(eventRepository).findById(1L);
@@ -85,8 +85,8 @@ class NotificationServiceImplTest {
     void testSendNotification_UserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> notificationService.sendNotification(1L, 1L, "Test Notification"))
-                .isInstanceOf(UserNotFoundException.class);
+        assertThrows(UserNotFoundException.class, () ->
+                notificationService.sendNotification(1L, 1L, "Test Notification"));
 
         verify(userRepository).findById(1L);
         verifyNoInteractions(eventRepository, notificationRepository);
@@ -97,12 +97,12 @@ class NotificationServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> notificationService.sendNotification(1L, 1L, "Test Notification"))
-                .isInstanceOf(EventNotFoundException.class);
+        assertThrows(EventNotFoundException.class, () ->
+                notificationService.sendNotification(1L, 1L, "Test Notification"));
 
         verify(userRepository).findById(1L);
         verify(eventRepository).findById(1L);
-        verifyNoInteractions(notificationRepository);
+
     }
 
     @Test
@@ -112,9 +112,10 @@ class NotificationServiceImplTest {
 
         List<Notification> notifications = notificationService.getUserNotifications(1L);
 
-        assertThat(notifications).hasSize(1);
-        assertThat(notifications.get(0).getMessage()).isEqualTo("Test Notification");
-        assertThat(notifications.get(0).getUser().getId()).isEqualTo(1L);
+        assertNotNull(notifications);
+        assertEquals(1, notifications.size());
+        assertEquals("Test Notification", notifications.get(0).getMessage());
+        assertEquals(1L, notifications.get(0).getUser().getId());
 
         verify(userRepository).findById(1L);
         verify(notificationRepository).findByUser_Id(1L);

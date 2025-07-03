@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -72,9 +72,9 @@ class FeedbackServiceImplTest {
 
         Feedback savedFeedback = feedbackService.submitFeedback(1L, 1L, 4, "Good event");
 
-        assertThat(savedFeedback).isNotNull();
-        assertThat(savedFeedback.getRating()).isEqualTo(4);
-        assertThat(savedFeedback.getComments()).isEqualTo("Good event");
+        assertNotNull(savedFeedback);
+        assertEquals(4, savedFeedback.getRating());
+        assertEquals("Good event", savedFeedback.getComments());
 
         verify(userRepository).findById(1L);
         verify(eventRepository).findById(1L);
@@ -85,8 +85,8 @@ class FeedbackServiceImplTest {
     void testSubmitFeedback_UserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> feedbackService.submitFeedback(1L, 1L, 5, "Great"))
-                .isInstanceOf(UserNotFoundException.class);
+        assertThrows(UserNotFoundException.class,
+                () -> feedbackService.submitFeedback(1L, 1L, 5, "Great"));
     }
 
     @Test
@@ -94,19 +94,20 @@ class FeedbackServiceImplTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> feedbackService.submitFeedback(1L, 1L, 5, "Great"))
-                .isInstanceOf(EventNotFoundException.class);
+        assertThrows(EventNotFoundException.class,
+                () -> feedbackService.submitFeedback(1L, 1L, 5, "Great"));
     }
 
     @Test
     void testGetEventFeedback() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event)); // ✅ Add this
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         when(feedbackRepository.findByEventEventID(1L)).thenReturn(List.of(feedback));
 
         List<Feedback> feedbackList = feedbackService.getEventFeedback(1L);
 
-        assertThat(feedbackList).hasSize(1);
-        assertThat(feedbackList.get(0).getEvent().getEventID()).isEqualTo(1L);
+        assertNotNull(feedbackList);
+        assertEquals(1, feedbackList.size());
+        assertEquals(1L, feedbackList.get(0).getEvent().getEventID());
 
         verify(eventRepository).findById(1L);
         verify(feedbackRepository).findByEventEventID(1L);
@@ -114,18 +115,18 @@ class FeedbackServiceImplTest {
 
     @Test
     void testGetUserFeedback() {
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user)); // ✅ Add this
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(feedbackRepository.findByUserId(1L)).thenReturn(List.of(feedback));
 
         List<Feedback> feedbackList = feedbackService.getUserFeedback(1L);
 
-        assertThat(feedbackList).hasSize(1);
-        assertThat(feedbackList.get(0).getUser().getId()).isEqualTo(1L);
+        assertNotNull(feedbackList);
+        assertEquals(1, feedbackList.size());
+        assertEquals(1L, feedbackList.get(0).getUser().getId());
 
         verify(userRepository).findById(1L);
         verify(feedbackRepository).findByUserId(1L);
     }
-
 
     @Test
     void testCalculateAverageRating() {
@@ -134,40 +135,38 @@ class FeedbackServiceImplTest {
         Feedback f2 = new Feedback();
         f2.setRating(5);
 
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event)); // ✅ Add this
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         when(feedbackRepository.findByEventEventID(1L)).thenReturn(List.of(f1, f2));
 
         double avg = feedbackService.calculateAverageRating(1L);
 
-        assertThat(avg).isEqualTo(4.5);
+        assertEquals(4.5, avg, 0.01);
+
         verify(eventRepository).findById(1L);
         verify(feedbackRepository).findByEventEventID(1L);
     }
 
-
     @Test
     void testCalculateAverageRating_NoFeedback() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event)); // 👈 add this
+        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
         when(feedbackRepository.findByEventEventID(1L)).thenReturn(List.of());
 
         double avg = feedbackService.calculateAverageRating(1L);
 
-        assertThat(avg).isEqualTo(0.0);
+        assertEquals(0.0, avg, 0.01);
     }
-    
+
     @Test
     void testGetEventFeedback_EventNotFound() {
         when(eventRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> feedbackService.getEventFeedback(1L))
-                .isInstanceOf(EventNotFoundException.class);
+        assertThrows(EventNotFoundException.class, () -> feedbackService.getEventFeedback(1L));
     }
 
     @Test
     void testGetUserFeedback_UserNotFound() {
         when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> feedbackService.getUserFeedback(1L))
-                .isInstanceOf(UserNotFoundException.class);
+        assertThrows(UserNotFoundException.class, () -> feedbackService.getUserFeedback(1L));
     }
 }

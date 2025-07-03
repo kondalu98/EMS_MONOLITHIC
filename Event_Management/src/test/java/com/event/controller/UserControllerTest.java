@@ -80,7 +80,7 @@ class UserControllerTest {
         // Arrange: new user details to be updated
         User updatedUser = new User();
         updatedUser.setId(1L);
-        updatedUser.setName("Updated Name");
+        updatedUser.setName("kondalu");
         updatedUser.setEmail("test@example.com");
         updatedUser.setPassword("newpassword");
         updatedUser.setContactNumber("9998887770");
@@ -92,7 +92,7 @@ class UserControllerTest {
                         .content(objectMapper.writeValueAsString(updatedUser)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("Updated Name"))
+                .andExpect(jsonPath("$.name").value("kondalu"))
                 .andExpect(jsonPath("$.contactNumber").value("9998887770"));
     }
 
