@@ -33,12 +33,7 @@ public class SecurityConfig {
                 // Public endpoints
                 .requestMatchers(
                         "/api/users/**",
-                        "/api/admin/login",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
-                        "/v3/api-docs",
-                        "/v3/api-docs.yaml"
+                        "/api/admin/login"
                 ).permitAll()
 
                 //  feedback POST
@@ -60,11 +55,11 @@ public class SecurityConfig {
                     return new AuthorizationDecision(email.equals(adminEmail));
                 })
 
-                    //Authenticated users can book the tickets
-                .requestMatchers("/api/tickets/**").authenticated()
 
-                    //Authenticated users can give the feedback
-                .requestMatchers(HttpMethod.POST, "/api/feedback/**").authenticated()
+                .requestMatchers("/api/tickets/**").permitAll()
+
+
+                .requestMatchers(HttpMethod.POST, "/api/feedback").permitAll()
 
 
                 // Only admin can POST notifications
@@ -83,7 +78,7 @@ public class SecurityConfig {
                 // Feedback GET by user is public
                 .requestMatchers(HttpMethod.GET, "/api/feedback/user/**").permitAll()
 
-                // Authenticated users can get notification alerts
+
                 .requestMatchers(HttpMethod.GET, "/api/notifications/alerts/**").authenticated()
 
                 // Any other request must be authenticated

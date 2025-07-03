@@ -66,6 +66,7 @@ class FeedbackControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin@example.com")
     void testSubmitFeedback() throws Exception {
         when(feedbackService.submitFeedback(anyLong(), anyLong(), anyInt(), anyString()))
                 .thenReturn(feedback);
@@ -97,6 +98,7 @@ class FeedbackControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin@example.com")
     void testGetUserFeedback() throws Exception {
         List<Feedback> feedbackList = Arrays.asList(feedback);
         when(feedbackService.getUserFeedback(anyLong())).thenReturn(feedbackList);
