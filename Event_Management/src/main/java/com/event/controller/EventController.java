@@ -19,6 +19,7 @@ public class EventController {
 
     @Autowired
     public EventController(EventService eventService) {
+
         this.eventService = eventService;
     }
 
@@ -47,8 +48,8 @@ public class EventController {
 
     @DeleteMapping("/event/{id}")
     public ResponseEntity<String> deleteEvent(@PathVariable Long id) {
-        eventService.deleteEvent(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        String result = eventService.deleteEvent(id);
+        return new ResponseEntity<>(result, HttpStatus.OK); // 200 OK with message
     }
 
     @GetMapping("/category")

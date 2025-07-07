@@ -77,6 +77,7 @@ public class EventServiceImpl implements EventService {
             throw new EventNotFoundException(eventID);
         }
         eventRepository.deleteById(eventID);
+
         return "Event with ID " + eventID + " has been successfully deleted.";
     }
 }

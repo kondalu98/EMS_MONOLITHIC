@@ -1,5 +1,6 @@
 package com.event.controller;
 
+import com.event.dto.BookingRequest;
 import com.event.entity.Ticket;
 import com.event.service.TicketService;
 import com.event.service.TicketServiceImpl;
@@ -24,16 +25,12 @@ public class TicketController {
 
 
     @PostMapping("/book")
-    public ResponseEntity<Ticket> bookTicket(@RequestBody Map<String, Long> bookingRequest) {
-        Long eventId = bookingRequest.get("eventId");
-        Long userId = bookingRequest.get("userId");
-
-        if (eventId == null || userId == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    public ResponseEntity<?> bookTicket(@RequestBody BookingRequest request) {
+        if (request.getEventId() == null || request.getUserId() == null) {
+            return ResponseEntity.badRequest().body("Missing eventId or userId");
         }
-
-        Ticket bookedTicket = ticketService.bookTicket(eventId, userId);
-        return new ResponseEntity<>(bookedTicket, HttpStatus.CREATED); // 201
+        Ticket bookedTicket = ticketService.bookTicket(request.getEventId(), request.getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookedTicket);
     }
 
 
