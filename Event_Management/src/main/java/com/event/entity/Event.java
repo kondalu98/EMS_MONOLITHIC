@@ -12,6 +12,7 @@ public class  Event {
     private String name;
     private String category;
     private String location;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private String organizerID;
