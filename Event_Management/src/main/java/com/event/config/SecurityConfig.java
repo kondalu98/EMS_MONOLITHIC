@@ -53,7 +53,8 @@ public class SecurityConfig {
                                 "/api/events/{id}",
                                 "/api/events/date",
                                 "/api/events/location",
-                                "/api/events/category"
+                                "/api/events/category",
+                                "/api/users/{email}"
 
 
                         ).permitAll()
