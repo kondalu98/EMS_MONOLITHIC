@@ -58,4 +58,8 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Something went wrong: " + ex.getMessage(),
                 HttpStatus.INTERNAL_SERVER_ERROR); // 500
     }
+    @ExceptionHandler(EmailNotFoundException.class)
+    public ResponseEntity<String> handleEmailNotFound(EmailNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }
