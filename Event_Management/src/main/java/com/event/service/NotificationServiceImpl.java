@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -48,6 +49,26 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.save(notification);
     }
 
+
+    @Override
+    public List<Notification> broadcastToAllUsers(Long eventId, String message) {
+        List<User> users = userRepository.findAll();
+        Event event = eventRepository.findById(eventId).orElseThrow();
+
+        List<Notification> notifications = new ArrayList<>();
+
+        for (User user : users) {
+            Notification notification = new Notification();
+            notification.setUser(user);
+            notification.setEvent(event);
+            notification.setMessage(message);
+            notification.setSentTimestamp(LocalDateTime.now()); // ✅ Add this line
+            notifications.add(notification);
+        }
+
+
+        return notificationRepository.saveAll(notifications);
+    }
     public List<Notification> getUserNotifications(Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));

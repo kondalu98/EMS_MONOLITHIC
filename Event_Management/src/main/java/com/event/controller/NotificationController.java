@@ -39,4 +39,12 @@ public class NotificationController {
         }
         return new ResponseEntity<>(notifications, HttpStatus.OK); // 200 OK
     }
+
+    @PostMapping("/broadcast")
+    public ResponseEntity<List<Notification>> broadcastNotification(
+            @RequestParam Long eventId,
+            @RequestParam String message) {
+        List<Notification> notifications = notificationService.broadcastToAllUsers(eventId, message);
+        return new ResponseEntity<>(notifications, HttpStatus.CREATED);
+    }
 }

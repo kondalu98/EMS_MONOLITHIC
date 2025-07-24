@@ -7,5 +7,6 @@ import java.util.List;
 public interface NotificationService {
 
     public Notification sendNotification(Long userId, Long eventId, String message);
+    List<Notification> broadcastToAllUsers(Long eventId, String message);
     public List<Notification> getUserNotifications(Long userId);
 }
