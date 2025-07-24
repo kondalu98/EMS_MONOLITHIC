@@ -14,6 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
+@CrossOrigin(origins = "http://localhost:4200")
 public class TicketController {
 
     private final TicketService ticketService;

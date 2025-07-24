@@ -54,12 +54,13 @@ public class SecurityConfig {
                                 "/api/events/date",
                                 "/api/events/location",
                                 "/api/events/category",
-                                "/api/users/{email}"
+                                "/api/users/{email}","/api/feedback/event-rating/**",
+                                "/api/feedback/event/**"
 
 
                         ).permitAll()
 
-                        .requestMatchers( "/api/events/event","/api/events/event/{id}").access((authContext, context) -> {
+                        .requestMatchers( "/api/events/event","/api/events/event/{id}","/api/users/all").access((authContext, context) -> {
                             String email = authContext.get().getName();
                             return new AuthorizationDecision(email.equals(adminEmail));
                         })
@@ -73,7 +74,7 @@ public class SecurityConfig {
                         })
 
                         // Only admin can GET feedback for events
-                        .requestMatchers(HttpMethod.GET, "/api/feedback/event/**", "/api/feedback/event-rating/**", "api/feedback/user/{id}")
+                        .requestMatchers(HttpMethod.GET,  "api/feedback/user/{id}")
                         .access((authContext, context) -> {
                             String email = authContext.get().getName();
                             return new AuthorizationDecision(email.equals(adminEmail));
@@ -96,7 +97,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH","DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 

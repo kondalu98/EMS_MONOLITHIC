@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -60,5 +62,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new EmailNotFoundException("User not found with email: " + email));
     }
 
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
 }

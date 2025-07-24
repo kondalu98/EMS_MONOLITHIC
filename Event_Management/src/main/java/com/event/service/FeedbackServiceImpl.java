@@ -65,7 +65,9 @@ public class FeedbackServiceImpl implements FeedbackService {
                 .orElseThrow(() -> new EventNotFoundException(eventId));
 
         List<Feedback> feedbackList = feedbackRepository.findByEventEventID(eventId);
-        return feedbackList.stream().mapToInt(Feedback::getRating).average().orElse(0.0);
+        double average = feedbackList.stream().mapToInt(Feedback::getRating).average().orElse(0.0);
+        return Math.ceil(average); // Rounds up the average
     }
+
 
 }
