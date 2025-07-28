@@ -54,6 +54,7 @@ public class SecurityConfig {
                                 "/api/events/date",
                                 "/api/events/location",
                                 "/api/events/category",
+                                "/api/events/filter",
                                 "/api/users/{email}","/api/feedback/event-rating/**",
                                 "/api/feedback/event/**"
 

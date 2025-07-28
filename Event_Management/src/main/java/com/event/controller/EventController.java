@@ -2,7 +2,7 @@ package com.event.controller;
 
 import com.event.entity.Event;
 import com.event.service.EventService;
-import com.event.service.EventServiceImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +30,7 @@ public class EventController {
         Event createdEvent = eventService.createEvent(event);
         return new ResponseEntity<>(createdEvent, HttpStatus.CREATED);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<Event> getEventById(@PathVariable Long id) {
@@ -68,4 +69,19 @@ public class EventController {
     public ResponseEntity<List<Event>> getByDate(@RequestParam LocalDate date) {
         return ResponseEntity.ok(eventService.findByDate(date));
     }
+    @GetMapping("/filter")
+    public ResponseEntity<List<Event>> getEventsByDateAndLocation(
+            @RequestParam(required = false) String date,
+            @RequestParam(required = false) String location) {
+
+        LocalDate localDate = null;
+        if (date != null && !date.isEmpty()) {
+            localDate = LocalDate.parse(date);
+        }
+
+        List<Event> filteredEvents = eventService.getEventsByDateAndLocation(localDate, location);
+        return ResponseEntity.ok(filteredEvents);
+    }
+
+
 }

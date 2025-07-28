@@ -16,10 +16,11 @@ public interface EventService {
     List<Event> findByLocation(String location);
 
     List<Event> findByDate(LocalDate date);
-
+    List<Event> getEventsByDateAndLocation(LocalDate date, String location);
     List<Event> getAllEvents();
 
     Event updateEvent(Long eventID, Event eventDetails); // throws EventNotFoundException
 
-    String deleteEvent(Long eventID); // throws EventNotFoundException
+    String deleteEvent(Long eventID);
+    // throws EventNotFoundException
 }

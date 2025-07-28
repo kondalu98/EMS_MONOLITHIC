@@ -10,14 +10,11 @@ import java.util.List;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Long> {
 
-
+    List<Event> findByDateAndLocation(LocalDate date, String location);
     List<Event> findByCategory(String category);
-
     List<Event> findByLocation(String location);
-
     List<Event> findByDate(LocalDate date);
 
-//    List<Event> findByDateAndLocation(LocalDate date, String location);
-//    List<Event> findByCategoryAndDateAndLocation(String category, LocalDate date, String location);
+
 }
 

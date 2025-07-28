@@ -55,6 +55,7 @@ public class EventServiceImpl implements EventService {
         return events;
     }
 
+
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
     }
@@ -80,4 +81,18 @@ public class EventServiceImpl implements EventService {
 
         return "Event with ID " + eventID + " has been successfully deleted.";
     }
+
+
+    public List<Event> getEventsByDateAndLocation(LocalDate date, String location) {
+        if (date != null && location != null) {
+            return eventRepository.findByDateAndLocation(date, location);
+        } else if (date != null) {
+            return eventRepository.findByDate(date);
+        } else if (location != null) {
+            return eventRepository.findByLocation(location);
+        } else {
+            return eventRepository.findAll();
+        }
+    }
+
 }
